@@ -1,0 +1,4 @@
+.vscode
+src/public/*
+*.log
+aoiawd.phar
