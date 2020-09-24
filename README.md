@@ -51,7 +51,7 @@ AoiAWD 分为六个组件，组件间互相配合实现系统的完整功能
 ### 系统进程列表
 ![](Readme/processlog.png)
 ### 告警日志列表
-![](Readme/alert.png)
+![](Readme/alertlog.png)
 ### 双击告警日志后高亮关联
 ![](Readme/highlight.png)
 
