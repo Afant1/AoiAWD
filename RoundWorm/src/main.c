@@ -84,8 +84,8 @@ void help_info()
     printf("RoundWorm: AoiAWD Filesystem & Process Monitor Tool\r\n");
     printf("Usage: %s [OPTIONS]\r\n", global_args.argv[0]);
     printf("\t -d Running in daemon mode.\r\n");
-    printf("\t -s [HOST] Network interface. Default: 127.0.0.1\r\n");
-    printf("\t -p [PORT] Scan network cidr. Default: 8023\r\n");
+    printf("\t -s [HOST] AoiAWD Probe IP. Default: 127.0.0.1\r\n");
+    printf("\t -p [PORT] AoiAWD Probe PORT. Default: 8023\r\n");
     printf("\t -w [PATH] Inotify watch dir, ';' as divider. Default: /tmp\r\n");
     printf("\t -i [MSECOND] Process watch interval. Default: 100\r\n");
     printf("\t -h This help info\r\n");

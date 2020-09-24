@@ -32,6 +32,29 @@ AoiAWD 分为六个组件，组件间互相配合实现系统的完整功能
 
 ![](Readme/struct.png)
 
+## 系统截图
+
+### 登陆界面
+![](Readme/login.png)
+### 仪表盘
+![](Readme/dashboard.png)
+### Web日志列表
+![](Readme/weblog.png)
+### Web日志详情
+![](Readme/webdetail.png)
+### PWN日志列表
+![](Readme/pwnlog.png)
+### PWN日志详情
+![](Readme/pwndetail.png)
+### 文件系统日志列表
+![](Readme/filelog.png)
+### 系统进程列表
+![](Readme/processlog.png)
+### 告警日志列表
+![](Readme/alert.png)
+### 双击告警日志后高亮关联
+![](Readme/highlight.png)
+
 ## 编译、安装与使用方法
 ### MongoDB Server
 用于记录庞大的流量文件的数据库，是整个系统的核心存储。
@@ -64,9 +87,52 @@ Usage: ./aoiawd.phar [OPTIONS]
 [2020-09-24 15:21:21] aoicommon\socket\AsyncTCPServer.info: Listening on 0.0.0.0:8023 [] [] #<-- 探针上线地址
 ```
 ### Guardian
-
+一个二进制PWN的影子外壳，其原理是包裹在PWN题目外侧，在每次被启动的时候透明记录STDIN与STDOUT的流量，并快照PWN程序的内存结构(/proc/????/mem)上传回AoiAWD Core。
+- 在项目目录运行compile.php将会编译影子壳程序和捆绑程序: guardian.phar，一般是在选手电脑上进行捆绑后将生成文件上传到靶机。
+- 直接运行捆绑程序会输出帮助文本，其中比较重要的一些参数是:
+  - -i: 输入需要套壳的PWN题目程序路径
+  - -s: 输入可以从靶机访问到探针上线地址的URL，比如说192.168.???.???:8023
+```
+Guardian: AoiAWD ELF PWNMonitor Tool
+Usage: ./guardian.phar [PATH]
+         -i [PATH] Original ELF.
+         -o [PATH] Path of patched ELF. Default: {$OriginalELF}.guardianed
+         -s [URI] Log recoard server URI. Default: 127.0.0.1:8023
+         -h This help info
+```
 ### TapeWorm
-
+一个PHP Web的影子外壳，其原理是自动注入到**所有**PHP文件的头部，支持输入输出流量的抓取与上报，同时具有处理输出数据的能力，实现输出内容篡改。
+- 程序内部的代码已经实现了单实例启动，即便是层层include了多次，也只会运行最先触发的影子外壳。所以不用担心复杂的题目影响性能。
+- 自动注入程序会智能识别面向对象的文件(包含 namespace 关键字)，和直接面向过程的PHP文件，**一般**情况下不会造成语法错误。
+- 自动注入程序会识别已经被注入的脚本并加以跳过，所以多次反复无脑对web根目录运行注入程序并不会造成什么太大的问题。
+- 运行compile.php就可以生成自动注入程序，一般情况下可以上传到靶机上直接对web根目录进行注入，或者在选手电脑上注入好之后再上传到靶机上。
+- **一时注入一时爽，忘记备份宕机慌**
+- 直接运行注入程序会显示帮助文本，其中比较重要的一些参数是:
+  - -d: 需要注入外壳的web根目录，会从此目录递归感染所有的PHP文件。
+  - -s: 输入可以从靶机访问到探针上线地址的URL，比如说192.168.???.???:8023。
+```
+TapeWorm: AoiAWD PHP WebMonitor Tool
+Usage: ./tapeworm.phar [PATH]
+         -d [PATH] WebMonitor inject dir.
+         -s [URI] Log recoard server URI. Default: 127.0.0.1:8023
+         -f [PATH] Inject file path. Default: {$dir}
+         -h This help info
+```
 ### RoundWorm
-
-## 系统截图
+一个监控文件系统和进程的系统行为监视器，其原理是扫描/proc文件夹获取当前正在运行的所有进程的信息，以及利用Linux系统的inotify功能对指定文件夹的敏感文件操作进行全面的记录。
+- 直接运行make就可以编译生成
+- 一般来讲该程序在靶机上运行，选手电脑上没必要执行这玩意。
+- 添加-h参数即可看到帮助文档，其中比较重要的一些参数是:
+  - -d: 后台运行，你当然不想关掉ssh的时候就把探针也给关了。
+  - -s: 输入可以从靶机访问到探针上线地址的IP，比如说192.168.???.???。
+  - -w: 需要监控文件变化的路径，如果有多个路径使用';'分割，比如: -w "/tmp;/var/www/html"
+```
+RoundWorm: AoiAWD Filesystem & Process Monitor Tool
+Usage: ./roundworm [OPTIONS]
+         -d Running in daemon mode.
+         -s [HOST] AoiAWD Probe IP. Default: 127.0.0.1
+         -p [PORT] AoiAWD Probe PORT. Default: 8023
+         -w [PATH] Inotify watch dir, ';' as divider. Default: /tmp
+         -i [MSECOND] Process watch interval. Default: 100
+         -h This help info
+```
