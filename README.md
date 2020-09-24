@@ -31,6 +31,8 @@ AoiAWD 分为六个组件，组件间互相配合实现系统的完整功能
 - TapeWorm Web类型题目行为探针
 - RoundWorm 系统进程与文件系统行为探针
 
+![](Readme/struct.png)
+
 ### MongoDB Server
 用于记录庞大的流量文件的数据库，是整个系统的核心存储
 
